@@ -1,5 +1,6 @@
 using Core.Entities;
 using Core.Interfaces;
+using Core.Specifications;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +16,9 @@ public class ProductsController(IGenericRepository<Product> repo) : ControllerBa
      public async Task<ActionResult<IReadOnlyList<Product>>> GetProducts(string? brand, 
         string? type, string? sort)
     {
-        return Ok(await repo.ListAllAsync());
+        var spec = new ProductSpecification(brand, type, sort);
+        var products = await repo.ListAsync(spec);
+        return Ok(products);
     }
 
     [HttpGet("{id:int}")]
@@ -75,15 +78,18 @@ public class ProductsController(IGenericRepository<Product> repo) : ControllerBa
     [HttpGet("brands")]
     public async Task<ActionResult<IReadOnlyList<string>>> GetBrands()
     {
-        // TODO
-        return Ok();
+       var spec = new BrandListSpecification();
+
+        return Ok(await repo.ListAsync(spec));
     }
 
     [HttpGet("types")]
     public async Task<ActionResult<IReadOnlyList<string>>> GetTypes()
     {
           // TODO
-        return Ok();
+        var spec = new TypeListSpecification();
+
+        return Ok(await repo.ListAsync(spec));
     }
 
 
